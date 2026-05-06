@@ -67,7 +67,7 @@ jobs:
           git config user.name "alex-agent-bot"
           git config user.email "alex-agent-bot@users.noreply.github.com"
           git pull --rebase --autostash || true
-          git add --all -- seo-reports blog-briefs outreach-targets exchange logs reports || true
+          git add --all -- seo-reports exchange logs reports || true
           if git diff --cached --quiet; then
             echo "Nothing to commit."
           else

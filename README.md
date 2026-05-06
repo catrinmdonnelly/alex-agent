@@ -1,18 +1,56 @@
 # Alex
 
-A weekly SEO agent. Alex pulls Google Search Console for your site, compares the last 7 days against the previous 7, finds rising queries, declining pages, ranking opportunities, and writes a weekly report. He drafts content briefs and outreach targets too.
+A weekly SEO analyst for small businesses.
 
-He runs every Wednesday morning. The reports land in your repo as markdown files. Read in 10 minutes. Specific enough to act on the same day.
+Most owners set up Google Search Console once, find it overwhelming, and never go back. Their site might be ranking for things they don't know about. Pages that used to bring traffic are silently dying. Real people on Reddit are asking questions their site could answer if they knew the question existed.
+
+Alex tells you what's happening in your search traffic and what to do about it. Every Wednesday morning, before your week gets busy. Ten minutes to read.
 
 > **Status:** Free to use. Take the code, point it at your business. MIT licensed.
 
+## What Alex actually does for a business
+
+Take a small ecommerce brand selling handmade ceramic plant pots. £40k/month, two people, no marketing team. They've had Google Search Console set up for two years, never look at it. Every Wednesday at 10am, Alex pulls a week of data, scans the web for what's happening in their niche, and writes a report that lands like this:
+
+> Last week: 487 clicks from search, up 12% on the previous week. The driver was your "how to clean a ceramic plant pot" blog post, which jumped from page 3 to page 1 for "remove mineral deposits ceramic". Google likes how you wrote that. Page is sitting at position 4 with a 0.8% CTR though, that's bad. Meta title is "Cleaning Ceramic Plant Pots, Cornish Ceramics", generic. Try "How to remove white residue from ceramic plant pots". The query "ceramic plant pots for orchids" is sending you 80 impressions but you don't have a page about orchids. Quick blog post next week. There's a Mumsnet thread from yesterday where someone's asking about flaking glaze, your "Why glaze cracks" post is exactly the answer, draft reply below.
+
+That's the value. Not the report itself, anyone could write it given the data. The point is **someone is doing this for you every Wednesday morning, on time, without you having to remember to log into Search Console**.
+
+## Who Alex helps
+
+- A small business with a site that's already getting some search traffic (a few hundred impressions a week minimum)
+- An owner who'll act on a 10-minute weekly read
+- Someone willing to do the GSC service account setup. It's the fiddly bit, but it's a one-time thing.
+
+## Who Alex doesn't help
+
+- Brand new sites with no organic traffic yet
+- Owners who won't update meta descriptions or write a real reply to a forum thread
+- Sites without a Google Search Console property already set up and verified
+
+## What success looks like after 3 months
+
+Not a stack of beautiful reports. **Three or four things on your site changed because Alex flagged them.** A page got an updated title and the CTR doubled. A blog post got refreshed because it was decaying. A Reddit thread got a real human reply that earned a customer. A new page exists for a query you didn't know was sending you traffic.
+
+If a year goes by and nothing on your site looks different, Alex wasn't doing his job (or you weren't reading him).
+
 ## What you get every Wednesday
 
-- **A full SEO report** at `seo-reports/YYYY-MM-DD.md`. GSC dashboard, top keywords, new queries, opportunities, striking distance plays, CTR fixes, website amendments, backlink targets, forum threads with draft responses, quick wins.
-- **Content briefs** at `blog-briefs/YYYY-MM-DD.md`. Each keyword opportunity turned into a brief ready to draft.
-- **Outreach targets** at `outreach-targets/YYYY-MM-DD.md`. Backlink emails and forum threads with draft replies. Always review before sending.
-- **A trends file** at `exchange/seo-trends-latest.md`. Picked up automatically by a downstream content agent if you have one.
-- **A summary file** at `exchange/seo-report-latest.md`. Picked up by an upstream strategy agent if you have one.
+A single markdown file at `seo-reports/YYYY-MM-DD.md` with everything in one place:
+
+1. **GSC dashboard**, the headline numbers and what they mean
+2. **What to celebrate / what to worry about**, the signals from this week's data
+3. **Top keywords**, the queries actually sending you impressions and clicks
+4. **New queries**, things you started ranking for this week
+5. **Keyword opportunities**, gaps Alex spotted, with a recommended action for each
+6. **Striking distance plays**, queries you're close to ranking for, and how to push them
+7. **CTR gap fixes**, meta titles and descriptions that aren't pulling their weight
+8. **Website amendments**, on-page changes worth making
+9. **Backlink opportunities**, sites Alex thinks would link to you with the right pitch
+10. **Reddit and forum threads**, with draft responses you can edit and post
+11. **Quick wins**, anything you can do in under 15 minutes
+
+Plus two short companion files in `exchange/` for any other agent reading along, and a Station inbox JSON if you use the [Station widget](https://github.com/catrinmdonnelly/station).
 
 ## What it costs
 
@@ -20,25 +58,35 @@ About £2 a month in Anthropic API spend. Google Search Console is free. GitHub 
 
 ## What you'll need before you start
 
-1. A GitHub account.
-2. A site that's already verified in [Google Search Console](https://search.google.com/search-console) and has at least a few weeks of search data.
-3. An [Anthropic API key](https://console.anthropic.com).
-4. A Google Cloud account (free tier is fine) to create a service account that can read your GSC data.
-5. About 60 minutes for first-time setup. The GSC service account is the slow part.
+This is the most technical of the three agents to set up. Plan an hour the first time. The GSC service account is the only fiddly bit and you only do it once.
+
+1. A GitHub account
+2. A site already verified in [Google Search Console](https://search.google.com/search-console) with at least a few weeks of search data
+3. An [Anthropic API key](https://console.anthropic.com)
+4. A Google Cloud account (free tier is fine) to create a service account that can read your GSC data
+5. About 60 minutes for first-time setup
+
+If the GSC step looks daunting, [SETUP.md](SETUP.md) walks through every click. You can also paste it into ChatGPT or Claude and ask it to walk you through step by step.
 
 ## How it works
 
 1. Alex authenticates to Google Search Console using a service account you create
 2. Pulls 7 days of data and compares against the previous 7
-3. Reads your brand voice and current state from config files
-4. Calls Claude with web search to do the analysis and write the report
-5. Commits the report and a couple of summary files back to the repo
+3. Reads your `brand-voice.md` and `state.md` from config so recommendations sound like you
+4. Calls Claude with web search to spot competitors, forum threads, and trends
+5. Writes the report and commits it back to your repo
 
-The whole pipeline runs on GitHub Actions every Wednesday at 10:00 UK. If anything breaks, he emails you.
+The whole pipeline runs on GitHub Actions every Wednesday at 10:00 UK by default. If anything breaks, he emails you.
 
 ## Set up
 
-See [SETUP.md](SETUP.md) for the full step-by-step. The GSC service account is the only fiddly bit. It takes about 30 minutes the first time.
+See [SETUP.md](SETUP.md) for the full step-by-step. The short version:
+
+1. Fork this repo
+2. Edit `config/brand-voice.md` and `config/state.md` so Alex knows how you sound and what matters
+3. Set up a Google Cloud service account, give it read access to your GSC property (the fiddly bit)
+4. Add three secrets and two variables to your GitHub repo
+5. Run the workflow once to test, then let Wednesday's schedule take over
 
 ## Running it locally
 
@@ -55,24 +103,26 @@ The report will appear in `seo-reports/`.
 ## Customising
 
 - **Voice and approach.** Edit `config/system-prompt.md` to give Alex a different style. Leave it blank to use the default.
+- **What to focus on.** Edit `config/state.md` to tell Alex which pages matter most, which forums your audience reads, and what's off-limits.
 - **Schedule.** Edit `.github/workflows/weekly.yml`.
-- **Forums and outreach areas.** Edit `config/state.md` to tell Alex where your audience hangs out and where to leave alone.
+- **Model.** Set `ANTHROPIC_MODEL` to switch model.
+- **Timezone.** Set `AGENT_TIMEZONE` to any IANA name.
 
 ## The bigger picture
 
-Alex is one of three agents that work together if you run all of them:
+Alex can run alongside two siblings if you want a fuller setup:
 
 | Agent | Role | Cadence |
 |-------|------|---------|
 | **[Cleo](https://github.com/catrinmdonnelly/cleo-agent)** | Weekly growth strategy. Reads what's happening, decides the focus. | Mondays |
-| **Alex** | SEO. Pulls Search Console, finds rising queries and declining pages. | Wednesdays |
+| **Alex** | SEO. Pulls Search Console, finds rising queries and ranking opportunities. | Wednesdays |
 | **[Jess](https://github.com/catrinmdonnelly/jess-agent)** | Social content. Plans and posts daily Instagram carousels. | Daily |
 
-Each one runs on its own. Together, Alex reads Cleo's direction, picks SEO priorities that align, and posts trend findings any social agent can pick up.
+Each one runs on its own. You don't need to run all three.
 
 ## Help
 
-Issues and pull requests welcome. The GSC step is where most people get stuck — open an issue with which step is failing and the error message.
+Issues and pull requests welcome. The GSC step is where most people get stuck. Open an issue with which step is failing and the error message and I'll help.
 
 ## Licence
 

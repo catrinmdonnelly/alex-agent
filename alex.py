@@ -1,23 +1,21 @@
 """
-Alex — weekly SEO agent.
+Alex, weekly SEO agent.
 
-Runs once a week (default Wednesday 10:00 UK) and writes a weekly SEO report.
-Alex pulls Google Search Console for the last 7 days, compares against the
-previous 7, finds rising queries, declining pages, ranking opportunities,
-and writes the report. He also drafts content briefs and outreach targets
-for review.
+Runs once a week (default Wednesday 10:00 UK) and writes a single weekly
+SEO report. Alex pulls Google Search Console for the last 7 days, compares
+against the previous 7, finds rising queries, declining pages, ranking
+opportunities, CTR gaps, backlink targets, and forum threads worth a real
+human reply. Everything goes in one report file. Read in 10 minutes.
 
 Pipeline:
   1. Pull GSC data (last 7 days vs previous 7 days)
   2. Read optional weekly direction from a strategy agent
   3. Ask Claude (with web search) to produce the analysis
-  4. Write seo-reports/YYYY-MM-DD.md     — full report
-  5. Write blog-briefs/YYYY-MM-DD.md     — content briefs ready to draft
-  6. Write outreach-targets/YYYY-MM-DD.md — backlink and forum targets
-  7. Write exchange/seo-trends-latest.md  — trend findings for downstream agents
-  8. Write exchange/seo-report-latest.md  — short summary for upstream agents
-  9. Write reports/alex-<timestamp>.json  — Station inbox JSON
- 10. Email on failure
+  4. Write seo-reports/YYYY-MM-DD.md (the full report, for you)
+  5. Write exchange/seo-trends-latest.md (short version any downstream agent can read)
+  6. Write exchange/seo-report-latest.md (short summary for an upstream strategy agent)
+  7. Write reports/alex-<timestamp>.json (Station inbox JSON)
+  8. Email on failure
 
 Exit code 0 on success, 1 on any step failing.
 """
@@ -42,8 +40,6 @@ ROOT = Path(__file__).parent
 CONFIG = ROOT / "config"
 EXCHANGE = ROOT / "exchange"
 SEO_REPORTS = ROOT / "seo-reports"
-BLOG_BRIEFS = ROOT / "blog-briefs"
-OUTREACH = ROOT / "outreach-targets"
 LOGS = ROOT / "logs"
 REPORTS = ROOT / "reports"
 
@@ -83,7 +79,7 @@ def _gsc_credentials_path() -> Path:
     Resolve GSC service account credentials.
 
     Order of precedence:
-      1. GSC_CREDENTIALS_JSON env var — full JSON content (used in CI)
+      1. GSC_CREDENTIALS_JSON env var, full JSON content (used in CI)
       2. config/gsc-credentials.json (local only, do not commit)
     """
     raw = os.environ.get("GSC_CREDENTIALS_JSON", "").strip()
@@ -258,7 +254,7 @@ Hard rules on outreach:
 When you produce output, return ONE JSON object matching this schema exactly. No prose, no code fences:
 
 {
-  "gsc_summary": "2-3 sentence plain-English summary of the week's GSC numbers — what went up, what went down, what it means.",
+  "gsc_summary": "2-3 sentence plain-English summary of the week's GSC numbers, what went up, what went down, what it means.",
   "what_to_celebrate": ["short bullet", ...],
   "what_to_worry_about": ["short bullet", ...],
   "keyword_opportunities": [
@@ -298,12 +294,12 @@ def ask_claude(gsc: dict, direction: str, recent_trends: str) -> dict:
     try:
         import anthropic
     except ImportError:
-        raise RuntimeError("anthropic package not installed — run: pip install -r requirements.txt")
+        raise RuntimeError("anthropic package not installed, run: pip install -r requirements.txt")
 
     brand = read_if_exists(CONFIG / "brand-voice.md",
-                           "(brand-voice.md missing — fill in config/brand-voice.md to make recommendations match your tone)")[:4000]
+                           "(brand-voice.md missing, fill in config/brand-voice.md to make recommendations match your tone)")[:4000]
     state = read_if_exists(CONFIG / "state.md",
-                           "(state.md missing — fill in config/state.md so Alex understands current priorities)")[:4000]
+                           "(state.md missing, fill in config/state.md so Alex understands current priorities)")[:4000]
 
     gsc_compact = json.dumps({
         "window": gsc["window"],
@@ -327,7 +323,7 @@ BRAND (condensed):
 BUSINESS STATE:
 {state}
 
-WEEKLY DIRECTION (from your strategy agent, if any — align SEO priorities with this):
+WEEKLY DIRECTION (from your strategy agent, if any, align SEO priorities with this):
 {direction}
 
 PREVIOUS WEEK'S TREND FINDINGS YOU POSTED (avoid repeating the same angles):
@@ -376,7 +372,7 @@ Produce your weekly report as one JSON object. Use web_search when it would mean
 def render_full_report(analysis: dict, gsc: dict, business_name: str) -> str:
     out: list[str] = []
     date = today_key()
-    out.append(f"# {business_name} — SEO week of {date}\n")
+    out.append(f"# {business_name}, SEO week of {date}\n")
     out.append(f"*Alex. Window: {gsc['window']['current']['start']} → {gsc['window']['current']['end']}.*\n")
 
     t = gsc["totals"]
@@ -456,7 +452,7 @@ def render_full_report(analysis: dict, gsc: dict, business_name: str) -> str:
     if analysis.get("backlink_opportunities"):
         out.append("## Backlink opportunities\n")
         for b in analysis["backlink_opportunities"]:
-            out.append(f"- **{b.get('url','')}** — {b.get('why_relevant','')}")
+            out.append(f"- **{b.get('url','')}**, {b.get('why_relevant','')}")
             out.append(f"  - Approach: {b.get('suggested_approach','')}")
         out.append("")
 
@@ -472,7 +468,7 @@ def render_full_report(analysis: dict, gsc: dict, business_name: str) -> str:
     if analysis.get("trend_findings"):
         out.append("## Trend findings (for content)\n")
         for tr in analysis["trend_findings"]:
-            out.append(f"- **{tr.get('topic','')}** — {tr.get('angle','')}")
+            out.append(f"- **{tr.get('topic','')}**, {tr.get('angle','')}")
             out.append(f"  - Why now: {tr.get('why_now','')}")
         out.append("")
 
@@ -484,62 +480,10 @@ def render_full_report(analysis: dict, gsc: dict, business_name: str) -> str:
     return "\n".join(out)
 
 
-def render_blog_briefs(analysis: dict) -> str:
-    date = today_key()
-    out = [
-        f"# Alex's content briefs — week of {date}\n",
-        "Each brief below is ready to be turned into a draft.\n",
-    ]
-    opps = analysis.get("keyword_opportunities", [])
-    if not opps:
-        out.append("_No new briefs this week._\n")
-        return "\n".join(out)
-
-    for i, k in enumerate(opps, 1):
-        out.append(f"## Brief {i}: {k.get('keyword','')}\n")
-        out.append(f"- **Intent:** {k.get('intent','')}")
-        out.append(f"- **Why it matters:** {k.get('why_it_matters','')}")
-        out.append(f"- **Recommended action:** {k.get('action','')}")
-        out.append("")
-    return "\n".join(out)
-
-
-def render_outreach_targets(analysis: dict) -> str:
-    date = today_key()
-    out = [
-        f"# Alex's outreach targets — week of {date}\n",
-        "Each target below is ready for outreach. Review every draft before sending.\n",
-    ]
-    backlinks = analysis.get("backlink_opportunities", [])
-    threads = analysis.get("reddit_forum_threads", [])
-
-    if backlinks:
-        out.append("## Email outreach (backlinks & features)\n")
-        for i, b in enumerate(backlinks, 1):
-            out.append(f"### Target {i}: {b.get('url','')}\n")
-            out.append(f"- **Why relevant:** {b.get('why_relevant','')}")
-            out.append(f"- **Suggested approach:** {b.get('suggested_approach','')}")
-            out.append("")
-
-    if threads:
-        out.append("## Reddit & forum threads\n")
-        for i, t in enumerate(threads, 1):
-            out.append(f"### Thread {i}: {t.get('url','')}\n")
-            out.append(f"- **Summary:** {t.get('summary','')}")
-            out.append(f"- **Draft response (review before posting):**")
-            out.append("")
-            out.append(f"  > {t.get('draft_response','')}")
-            out.append("")
-
-    if not backlinks and not threads:
-        out.append("_No new outreach targets this week._\n")
-    return "\n".join(out)
-
-
 def render_trends_for_downstream(analysis: dict) -> str:
     date = today_key()
     out = [
-        f"# Alex's trend findings — week of {date}\n",
+        f"# Alex's trend findings, week of {date}\n",
         "Use these as raw material when planning content. Not scripts; angles.\n",
     ]
     trends = analysis.get("trend_findings", [])
@@ -556,7 +500,7 @@ def render_trends_for_downstream(analysis: dict) -> str:
         out.append("## Search language to echo\n")
         out.append("How real people are phrasing these searches right now:")
         for k in kws[:5]:
-            out.append(f"- \"{k.get('keyword','')}\" — {k.get('why_it_matters','')}")
+            out.append(f"- \"{k.get('keyword','')}\", {k.get('why_it_matters','')}")
         out.append("")
     return "\n".join(out)
 
@@ -565,19 +509,19 @@ def render_summary_for_upstream(analysis: dict, gsc: dict) -> str:
     date = today_key()
     t = gsc["totals"]
     out = [
-        f"# Alex's report summary — week of {date}\n",
+        f"# Alex's report summary, week of {date}\n",
         f"- Clicks: **{t['clicks']}** ({t['click_delta']:+d} vs previous week)",
         f"- Impressions: **{t['impressions']}** ({t['imp_delta']:+d})",
         "",
-        f"**What's working:** {'; '.join(analysis.get('what_to_celebrate', [])) or '—'}",
-        f"**What's worrying:** {'; '.join(analysis.get('what_to_worry_about', [])) or '—'}",
+        f"**What's working:** {'; '.join(analysis.get('what_to_celebrate', [])) or '(none)'}",
+        f"**What's worrying:** {'; '.join(analysis.get('what_to_worry_about', [])) or '(none)'}",
         "",
         f"**Top keyword opportunity:** "
-        + (analysis.get('keyword_opportunities', [{}])[0].get('keyword', '—')
-           if analysis.get('keyword_opportunities') else '—'),
+        + (analysis.get('keyword_opportunities', [{}])[0].get('keyword', '(none)')
+           if analysis.get('keyword_opportunities') else '(none)'),
         f"**Top backlink opportunity:** "
-        + (analysis.get('backlink_opportunities', [{}])[0].get('url', '—')
-           if analysis.get('backlink_opportunities') else '—'),
+        + (analysis.get('backlink_opportunities', [{}])[0].get('url', '(none)')
+           if analysis.get('backlink_opportunities') else '(none)'),
         "",
         f"Full report: seo-reports/{date}.md",
     ]
@@ -608,18 +552,19 @@ def write_station_report(run: RunResult) -> Path:
     if run.fully_successful:
         payload = {
             "agent": "alex",
-            "agent_display": "Alex — SEO",
+            "agent_display": "Alex, SEO",
             "timestamp": now_local().strftime("%Y-%m-%dT%H:%M:%S"),
             "status": "needs_input",
             "headline": f"Alex's weekly SEO report is ready ({run.date})",
             "summary": (
-                "GSC pulled, analysis done. Content briefs and outreach targets "
-                "are ready for review."
+                "GSC pulled, analysis done. Single report covers the dashboard, "
+                "keyword opportunities, CTR fixes, backlink targets, and forum "
+                "threads worth a real reply."
             ),
             "actions_needed": [
-                "Read the full report (~10 mins)",
+                "Read the full report (about 10 mins)",
                 "Action the meta title and quick win fixes Alex flagged",
-                "Review draft responses before posting anywhere",
+                "Review every draft response before posting anywhere",
             ],
             "files_created": run.files_written,
             "full_brief_path": f"seo-reports/{run.date}.md",
@@ -627,7 +572,7 @@ def write_station_report(run: RunResult) -> Path:
     else:
         payload = {
             "agent": "alex",
-            "agent_display": "Alex — SEO",
+            "agent_display": "Alex, SEO",
             "timestamp": now_local().strftime("%Y-%m-%dT%H:%M:%S"),
             "status": "needs_input",
             "headline": f"Alex's weekly run failed ({run.date})",
@@ -646,13 +591,13 @@ def write_station_report(run: RunResult) -> Path:
 def send_failure_email(run: RunResult) -> None:
     to_addr = env("FAILURE_EMAIL_TO", required=False)
     if not to_addr:
-        log("  (email alert skipped — FAILURE_EMAIL_TO not set)")
+        log("  (email alert skipped, FAILURE_EMAIL_TO not set)")
         return
     host = env("FAILURE_EMAIL_SMTP_HOST", required=False, default="smtp.gmail.com")
     from_addr = env("FAILURE_EMAIL_FROM", required=False, default=to_addr)
     password = env("FAILURE_EMAIL_SMTP_PASS", required=False)
     if not password:
-        log("  (email alert skipped — FAILURE_EMAIL_SMTP_PASS not set)")
+        log("  (email alert skipped, FAILURE_EMAIL_SMTP_PASS not set)")
         return
 
     run_url = (f"https://github.com/{os.environ.get('GITHUB_REPOSITORY', '')}"
@@ -724,18 +669,6 @@ def main() -> int:
     summary_path.write_text(render_summary_for_upstream(analysis, gsc))
     run.files_written.append(str(summary_path.relative_to(ROOT)))
     log(f"  summary:     {summary_path.relative_to(ROOT)}")
-
-    BLOG_BRIEFS.mkdir(exist_ok=True)
-    briefs_path = BLOG_BRIEFS / f"{run.date}.md"
-    briefs_path.write_text(render_blog_briefs(analysis))
-    run.files_written.append(str(briefs_path.relative_to(ROOT)))
-    log(f"  blog briefs: {briefs_path.relative_to(ROOT)}")
-
-    OUTREACH.mkdir(exist_ok=True)
-    outreach_path = OUTREACH / f"{run.date}.md"
-    outreach_path.write_text(render_outreach_targets(analysis))
-    run.files_written.append(str(outreach_path.relative_to(ROOT)))
-    log(f"  outreach:    {outreach_path.relative_to(ROOT)}")
 
     LOGS.mkdir(exist_ok=True)
     (LOGS / f"alex-gsc-{run.date}.json").write_text(json.dumps(gsc, indent=2, default=str))

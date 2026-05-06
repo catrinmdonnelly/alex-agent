@@ -16,7 +16,7 @@ You will *not* need to write any code.
 
 ---
 
-## Step 1 — get an Anthropic API key
+## Step 1. Get an Anthropic API key
 
 1. Go to [console.anthropic.com](https://console.anthropic.com).
 2. Sign up or sign in.
@@ -26,14 +26,14 @@ You will *not* need to write any code.
 
 ---
 
-## Step 2 — copy this repo into your GitHub
+## Step 2. Copy this repo into your GitHub
 
 1. Click **Fork** in the top right of [the GitHub page](https://github.com/catrinmdonnelly/alex-agent), or use **Use this template** for a clean repo.
 2. Either way, you now have your own copy.
 
 ---
 
-## Step 3 — create a Google Cloud service account
+## Step 3. Create a Google Cloud service account
 
 This is the slow step. A service account is a special Google account that Alex uses to talk to Search Console without needing your password.
 
@@ -97,22 +97,46 @@ That's the GSC step done. The service account can now read your data.
 
 ---
 
-## Step 4 — fill in your business context
+## Step 4. Fill in your business context. *This decides how useful Alex is.*
 
-1. In your GitHub repo, click into the `config/` folder.
-2. Edit `brand-voice.md`. Replace the placeholders with how your business actually writes. Bullet points are fine.
-3. Edit `state.md`. The pages-that-matter and forums sections are the most important.
-4. `system-prompt.md` is optional. Leave it as is to use Alex's default voice.
+The GSC connection (step 3) is the technical bit. This step is the bit that decides whether Alex's recommendations land or feel generic.
 
-Commit each file as you go using GitHub's pencil-edit interface.
+In your GitHub repo, click into the `config/` folder. There are three files that matter:
+
+### `brand-voice.md` (most important)
+
+How your business actually sounds in writing. Alex uses this to draft meta descriptions, page suggestions, outreach emails, and forum replies that don't sound like a robot trying to look human.
+
+Be specific. "Friendly" is too vague. "We use full sentences, never exclamation marks, and we say 'have a look' instead of 'check out'" is useful.
+
+### `state.md`
+
+The pages and topics that matter most. Where your audience hangs out online. What's off-limits. Without this, Alex will flag generic "opportunities" that don't fit your business.
+
+The two most important sections:
+- **Pages that matter most**: list the URLs you actually care about ranking. Two to ten is plenty.
+- **Forums and communities where your audience hangs out**: subreddits, Mumsnet boards, niche forums. Alex will look for relevant threads in these specifically.
+
+### `system-prompt.md` (optional)
+
+Leave blank to use Alex's default voice. Edit it if you want him to sound or behave differently.
+
+### How to do it
+
+1. Click into each file in `config/` on GitHub.
+2. Click the pencil icon to edit.
+3. Replace every placeholder with your real answers. Bullet points are fine.
+4. Click **Commit changes**.
+
+A good `state.md` is 200-400 words. A good `brand-voice.md` is similar.
 
 ---
 
-## Step 5 — add your secrets and variables to GitHub
+## Step 5. Add your secrets and variables to GitHub
 
 1. In your repo, click **Settings → Secrets and variables → Actions**.
 
-### Secrets (sensitive — encrypted)
+### Secrets (sensitive, encrypted)
 
 Click **New repository secret** for each:
 
@@ -121,7 +145,7 @@ Click **New repository secret** for each:
 | `ANTHROPIC_API_KEY` | The key from step 1 |
 | `GSC_CREDENTIALS_JSON` | The **entire content** of the JSON file from step 3d. Open the file in a text editor, select all, copy, paste. GitHub handles the escaping. |
 
-### Variables (visible — not encrypted)
+### Variables (visible, not encrypted)
 
 Click the **Variables** tab. Then **New repository variable** for each:
 
@@ -132,14 +156,14 @@ Click the **Variables** tab. Then **New repository variable** for each:
 
 ---
 
-## Step 6 — turn on Actions
+## Step 6. Turn on Actions
 
 1. In your repo, click **Actions** in the top tabs.
 2. If you see a yellow banner, click **I understand my workflows, go ahead and enable them**.
 
 ---
 
-## Step 7 — run Alex for the first time
+## Step 7. Run Alex for the first time
 
 1. **Actions** → click **Alex weekly SEO report** in the left sidebar.
 2. Click **Run workflow** → **Run workflow**.
@@ -156,7 +180,7 @@ Fix and re-run.
 
 ---
 
-## Step 8 (optional) — failure email alerts
+## Step 8 (optional). Failure email alerts
 
 Same as Cleo if you've set that up. Otherwise:
 
@@ -169,7 +193,7 @@ Same as Cleo if you've set that up. Otherwise:
 
 ---
 
-## Step 9 — change the schedule (optional)
+## Step 9. Change the schedule (optional)
 
 Alex runs at 10:00 UK every Wednesday by default. To change:
 
@@ -189,7 +213,7 @@ Every Wednesday morning, Alex will:
 1. Pull GSC data
 2. Compare to the previous week
 3. Read your config and any direction from upstream agents
-4. Write the full report, content briefs, outreach targets
+4. Write the full report
 5. Commit and push
 
 You'll see them appear in your repo when you next look.
@@ -198,12 +222,22 @@ You'll see them appear in your repo when you next look.
 
 ## Troubleshooting
 
-**`HttpError 403: User does not have sufficient permissions`** — The service account isn't on the Search Console property yet. Repeat step 3e.
+**`HttpError 403: User does not have sufficient permissions`**
 
-**`HttpError 404: Site not found`** — `GSC_SITE_URL` doesn't match what's in Search Console. Check the format exactly (`sc-domain:` vs `https://`, trailing slash).
+The service account isn't on the Search Console property yet. Repeat step 3e.
 
-**Empty report, "no data"** — Either the property is brand new and has no data yet, or the service account is on a different property than the URL in `GSC_SITE_URL`.
+**`HttpError 404: Site not found`**
 
-**The cron isn't firing** — GitHub Actions pauses cron schedules in repos with no activity for 60 days. Run the workflow manually once and the schedule resumes.
+`GSC_SITE_URL` doesn't match what's in Search Console. Check the format exactly (`sc-domain:` vs `https://`, trailing slash).
 
-**Recommendations are generic** — That's a config problem. Make `config/state.md` more specific: list the exact pages that matter, the exact topics you want to own, the forums where your audience actually is.
+**Empty report saying "no data"**
+
+Either the property is brand new and has no data yet, or the service account is on a different property than the URL in `GSC_SITE_URL`.
+
+**The cron isn't firing**
+
+GitHub Actions pauses cron schedules in repos with no activity for 60 days. Run the workflow manually once and the schedule resumes.
+
+**Recommendations are generic**
+
+That's a config problem. Make `config/state.md` more specific. List the exact pages that matter, the exact topics you want to own, and the forums where your audience actually is.
