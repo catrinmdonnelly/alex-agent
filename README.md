@@ -1,20 +1,18 @@
 # Alex
 
-A weekly SEO analyst for small businesses.
+A weekly SEO analyst for small businesses, who tells you exactly what's happening in your search traffic every Wednesday morning before your week gets busy and gives you the ten minutes of reading that actually matter.
 
-Most owners set up Google Search Console once, find it overwhelming, and never go back. Their site might be ranking for things they don't know about. Pages that used to bring traffic are silently dying. Real people on Reddit are asking questions their site could answer if they knew the question existed.
-
-Alex tells you what's happening in your search traffic and what to do about it. Every Wednesday morning, before your week gets busy. Ten minutes to read.
+Most owners set up Google Search Console once, find it overwhelming, and never go back, which means their site might be ranking for things they don't know about, pages that used to bring traffic are silently dying, and real people on Reddit are asking questions their site could answer perfectly if they only knew the question existed. Alex closes that gap every week.
 
 > **Status:** Free to use. Take the code, point it at your business. MIT licensed.
 
 ## What Alex actually does for a business
 
-Take a small ecommerce brand selling handmade ceramic plant pots. £40k/month, two people, no marketing team. They've had Google Search Console set up for two years, never look at it. Every Wednesday at 10am, Alex pulls a week of data, scans the web for what's happening in their niche, and writes a report that lands like this:
+Picture a small ecommerce brand selling handmade ceramic plant pots, turning over £40,000 a month with two people running it and no marketing team. They've had Google Search Console set up for two years and have never looked at it once. Every Wednesday at ten in the morning, Alex pulls a week of data, scans the web for what's happening in their niche, and writes a report that lands like this:
 
-> Last week: 487 clicks from search, up 12% on the previous week. The driver was your "how to clean a ceramic plant pot" blog post, which jumped from page 3 to page 1 for "remove mineral deposits ceramic". Google likes how you wrote that. Page is sitting at position 4 with a 0.8% CTR though, that's bad. Meta title is "Cleaning Ceramic Plant Pots, Cornish Ceramics", generic. Try "How to remove white residue from ceramic plant pots". The query "ceramic plant pots for orchids" is sending you 80 impressions but you don't have a page about orchids. Quick blog post next week. There's a Mumsnet thread from yesterday where someone's asking about flaking glaze, your "Why glaze cracks" post is exactly the answer, draft reply below.
+> Last week brought 487 clicks from search, up 12% on the previous week, and most of it came from your "how to clean a ceramic plant pot" blog post jumping from page three to page one for "remove mineral deposits ceramic" (Google clearly likes how you wrote that). The page is sitting at position four with a 0.8% click-through rate though, which is bad, because the meta title reads "Cleaning Ceramic Plant Pots, Cornish Ceramics", which is too generic, so try something like "How to remove white residue from ceramic plant pots" instead. The query "ceramic plant pots for orchids" is sending you eighty impressions a week but you don't have a single page about orchids on the site, so that's a quick blog post for next week. There's also a Mumsnet thread from yesterday where someone's asking about flaking glaze, and your existing "Why glaze cracks" post is exactly the answer, with a draft reply below ready for you to edit and post.
 
-That's the value. Not the report itself, anyone could write it given the data. The point is **someone is doing this for you every Wednesday morning, on time, without you having to remember to log into Search Console**.
+The value isn't the report itself, since anyone could write something similar given the data. The value is that **someone is writing it for you every Wednesday morning, on time, without you ever having to remember to log into Search Console**.
 
 ## Who Alex helps
 
@@ -28,11 +26,9 @@ That's the value. Not the report itself, anyone could write it given the data. T
 - Owners who won't update meta descriptions or write a real reply to a forum thread
 - Sites without a Google Search Console property already set up and verified
 
-## What success looks like after 3 months
+## What success looks like after three months
 
-Not a stack of beautiful reports. **Three or four things on your site changed because Alex flagged them.** A page got an updated title and the CTR doubled. A blog post got refreshed because it was decaying. A Reddit thread got a real human reply that earned a customer. A new page exists for a query you didn't know was sending you traffic.
-
-If a year goes by and nothing on your site looks different, Alex wasn't doing his job (or you weren't reading him).
+Success isn't a stack of beautifully-formatted reports piling up in your repo. It's three or four things that changed on your actual site because Alex flagged them: a page got an updated title and the click-through rate doubled, a blog post got refreshed because it was decaying, a Reddit thread got a real human reply that earned a customer, a new page exists for a query you didn't know was sending you traffic. If a year goes by and nothing on your site looks any different, Alex wasn't doing his job, or you weren't reading him.
 
 ## What you get every Wednesday
 
