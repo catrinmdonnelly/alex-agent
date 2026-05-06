@@ -1,0 +1,13 @@
+{
+  "agent": "alex",
+  "agent_display": "Alex, SEO",
+  "timestamp": "2026-05-06T17:16:15",
+  "status": "needs_input",
+  "headline": "Alex's weekly run failed (2026-05-06)",
+  "summary": "GSC pull failed: Missing required environment variable: GSC_SITE_URL",
+  "actions_needed": [
+    "Check the GitHub Actions run for full logs",
+    "Re-run the workflow once fixed"
+  ],
+  "files_created": []
+}
